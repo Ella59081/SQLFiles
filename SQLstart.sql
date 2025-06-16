@@ -73,7 +73,7 @@ CREATE TABLE Employees2 (
     Department NVARCHAR(50),
     Salary DECIMAL(10,2),
     HireDate DATE,
-    City NVARCHAR(50)
+    Cityï¿½NVARCHAR(50)
 );
 
 INSERT INTO Employees2 (FirstName, LastName, Department, Salary, HireDate, City) VALUES
