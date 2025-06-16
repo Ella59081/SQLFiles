@@ -119,8 +119,8 @@ INSERT INTO OrderItems VALUES
  (1010,105,10,2),
  (1011,106,11,1),
  (1012,106,12,2),
- (1013,107,13,5),
- (1014,107,14,2),
+ (11014013,107,13,5),
+ (,107,14,2),
  (1015,108,15,1),
  (1016,108,16,1),
  (1017,109,17,1),
@@ -201,3 +201,58 @@ JOIN Products P ON OI.ProductID = P.ProductID
 WHERE P.ProductName = 'Wireless Mouse'
 GROUP BY C.FirstName,C.LastName, P.ProductName
  
+
+ --find average order per customer
+
+SELECT C.FirstName + ' ' + C.LastName AS CustomerName , O.OrderID,
+AVG(OI.Quantity * P.UnitPrice) AS AvgOrder
+FROM Customers C
+JOIN Orders O ON C.CustomerID = O.CustomerID
+JOIN OrderItems OI ON O.OrderID = OI.OrderID
+JOIN Products P ON OI.ProductID = P.ProductID
+GROUP BY C.FirstName, C.LastName, O.OrderID
+
+
+--Find products never ordered in january 2025
+
+SELECT P.ProductID , P.ProductName, P.Category,
+P.UnitPrice
+FROM Products P
+JOIN OrderItems OI ON P.ProductID = OI.ProductID
+JOIN Orders O ON OI.OrderID = O.OrderID
+WHERE O.ShipDate NOT BETWEEN '2025-01-01' AND '2025-01-31'
+--(none)
+
+--find total items sold in each category
+
+SELECT P.Category, COUNT(O.OrderID) AS ItemsSold,
+SUM(OI.Quantity * P.UnitPrice) AS Total
+FROM Customers C
+JOIN Orders O ON C.CustomerID = O.CustomerID
+JOIN OrderItems OI ON O.OrderID = OI.OrderID
+JOIN Products P ON OI.ProductID = P.ProductID
+GROUP BY P.Category
+
+--find high value orders(Orders total that exceed 500)
+
+SELECT O.OrderID, C.FirstName + ' ' + C.LastName, P.Category, OI.Quantity,
+SUM(OI.Quantity * P.UnitPrice) AS TotalPrice
+FROM Customers C
+JOIN Orders O ON C.CustomerID = O.CustomerID
+JOIN OrderItems OI ON O.OrderID = OI.OrderID
+JOIN Products P ON OI.ProductID = P.ProductID
+GROUP BY O.OrderID, C.FirstName, C.LastName, P.Category, OI.Quantity
+HAVING SUM(OI.Quantity * P.UnitPrice) > 500
+
+--List all orders with at least one item in the appliances
+
+--latest purchase date per customer
+SELECT O.OrderID, C.FirstName + ' ' + C.LastName AS CustomerName,
+P.Category, OI.Quantity,
+SUM(OI.Quantity * P.UnitPrice) AS TotalPrice,
+MIN(O.ShipDate) AS LatestShipDate
+FROM Customers C
+JOIN Orders O ON C.CustomerID = O.CustomerID
+JOIN OrderItems OI ON O.OrderID = OI.OrderID
+JOIN Products P ON OI.ProductID = P.ProductID
+GROUP BY O.OrderID, C.FirstName, C.LastName, P.Category, OI.Quantity
